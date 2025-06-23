@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.sp
 import com.example.app_games_android.R
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun RegistroScreen(viewModel: RegistroViewModel) {
     Box(
@@ -110,6 +109,7 @@ fun Tittle(modifier: Modifier) {
         color = Color(0xFF0D7E0D)
     )
 }
+
 @Composable
 fun HeaderImage(modifier: Modifier) {
     Image(painter = painterResource(id = R.drawable.android_games ),
@@ -140,6 +140,7 @@ fun NombreFiel(nombre: String, onTextFieldChanged:(String) -> Unit) {
         )
     )
 }
+
 @Composable
 fun EmailField(email: String, onTextFieldChanged:(String) -> Unit) {
     TextField(

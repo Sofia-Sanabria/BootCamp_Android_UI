@@ -7,7 +7,6 @@ import android.util.Patterns
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 
-
 class RegistroViewModel: ViewModel() {
 
     // Crear LiveData para manejar TextFiel
@@ -27,7 +26,6 @@ class RegistroViewModel: ViewModel() {
     // Valor de carga de pagina
     private val _isLoading  = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
-
 
     fun onRegistroChanged(nombre: String, email: String, password: String, repeatPass: String) {
         _nombre.value = nombre
@@ -58,5 +56,4 @@ class RegistroViewModel: ViewModel() {
         delay(4.seconds)
         _isLoading.value = false
     }
-
 }
