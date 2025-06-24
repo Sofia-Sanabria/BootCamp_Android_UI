@@ -1,7 +1,6 @@
 package com.example.app_games_android.ui.login.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,11 +28,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.app_games_android.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun RegistroScreen(viewModel: RegistroViewModel) {
+fun RegistroScreen(viewModel: RegistroViewModel, navController: NavHostController) {
     Box(
         Modifier
             .fillMaxSize()
