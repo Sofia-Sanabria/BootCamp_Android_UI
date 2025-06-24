@@ -10,6 +10,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.app_games_android.navigation.AppNavigation
 import com.example.app_games_android.ui.login.LoginScreen
 import com.example.app_games_android.ui.login.LoginViewModel
 import com.example.app_games_android.ui.login.ui.RegistroScreen
@@ -27,7 +29,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LoginScreen(loginViewModel = LoginViewModel())
+                   val navController = rememberNavController()
+                    AppNavigation(navController = navController)
                 }
             }
         }

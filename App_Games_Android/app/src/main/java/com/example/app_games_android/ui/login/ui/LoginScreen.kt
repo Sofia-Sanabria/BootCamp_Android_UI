@@ -11,9 +11,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.livedata.observeAsState
 import kotlinx.coroutines.launch
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.Icons
 
 @Composable
-fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
+fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = viewModel()) {
     // Traigo los datos del ViewModel (email, password, si el login está habilitado y si está cargando)
     val email: String by loginViewModel.email.observeAsState("")
     val password: String by loginViewModel.password.observeAsState("")
@@ -22,6 +27,8 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
 
     // Para lanzar corutinas cuando toque hacer login
     val coroutineScope = rememberCoroutineScope()
+    // variable para controlar la visibilidad
+    var passwordVisible by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -64,6 +71,13 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                     label = { Text("Password") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        val icon = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(imageVector = icon, contentDescription = null)
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -89,6 +103,18 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Iniciar Sesión")
+                }
+                //agrego boton de registrarse y texto
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text("¿No tienes una cuenta?")
+                TextButton(onClick = { navController.navigate("registro")  }) {
+                    Text("Registrarse")
+                    }
                 }
             }
         }
