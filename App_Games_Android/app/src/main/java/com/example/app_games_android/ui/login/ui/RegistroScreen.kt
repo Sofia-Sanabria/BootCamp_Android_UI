@@ -1,6 +1,7 @@
 package com.example.app_games_android.ui.login.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -45,26 +46,32 @@ fun RegistroScreen(viewModel: RegistroViewModel) {
 @Composable
 fun Registro(modifier: Modifier, viewModel: RegistroViewModel) {
 
-    // Traer la variable del viewController e inicializar
+    // Observa los estados del ViewModel usando LiveData con Compose
     val nombre: String by viewModel.nombre.observeAsState(initial = "")
     val email: String by viewModel.email.observeAsState(initial = "")
     val password: String by viewModel.password.observeAsState(initial = "")
     val repeatPass: String by viewModel.repeatPass.observeAsState(initial = "")
     val registroEnable: Boolean by viewModel.registroEnable.observeAsState(initial = false) // El boton inicia deshabilitado
     val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
+
+    // Scope para lanzar corrutinas desde Compose
     val coroutineScope = rememberCoroutineScope()
 
+    // Muestra un loader si isLoading es true
     if(isLoading) {
         Box(Modifier.fillMaxSize()) {
             CircularProgressIndicator(Modifier.align(Alignment.Center))
         }
     } else {
+        // Contenido del formulario
         Column(modifier = modifier) {
             Tittle(Modifier.align(Alignment.CenterHorizontally))
             Spacer(modifier = Modifier.padding(16.dp))
             HeaderImage(Modifier.align(Alignment.CenterHorizontally))
             Spacer(modifier = Modifier.padding(16.dp))
-            NombreFiel(nombre) {viewModel.onRegistroChanged(it, email, password, repeatPass)}
+
+            // Campos del formulario: actualizan el estado en el ViewModel
+            NombreField(nombre) {viewModel.onRegistroChanged(it, email, password, repeatPass)}
             Spacer(modifier = Modifier.padding(4.dp))
             EmailField(email) {viewModel.onRegistroChanged(nombre, it, password, repeatPass)}
             Spacer(modifier = Modifier.padding(4.dp))
@@ -72,6 +79,8 @@ fun Registro(modifier: Modifier, viewModel: RegistroViewModel) {
             Spacer(modifier = Modifier.padding(4.dp))
             RepeatPasswordField(repeatPass) {viewModel.onRegistroChanged(nombre, email, password, it)}
             Spacer(modifier = Modifier.padding(16.dp))
+
+            // Botón de "Registrarse" que sigue un hilo
             RegistroButton(registroEnable) {
                 coroutineScope.launch {
                     viewModel.onRegistroSelected()
@@ -81,6 +90,7 @@ fun Registro(modifier: Modifier, viewModel: RegistroViewModel) {
     }
 }
 
+// Botón que se habilita solo si todos los datos son válidos
 @Composable
 fun RegistroButton(registroEnable: Boolean, onRegistroSelected: () -> Unit) {
     Button(
@@ -93,7 +103,7 @@ fun RegistroButton(registroEnable: Boolean, onRegistroSelected: () -> Unit) {
             disabledContainerColor = Color(0xFF77BD6E),
             contentColor = Color.White,
             disabledContentColor = Color.White
-        ), enabled = registroEnable
+        ), enabled = registroEnable // se habilita según el estado
     ) {
         Text(text = "Registrarse")
     }
@@ -119,15 +129,15 @@ fun HeaderImage(modifier: Modifier) {
 }
 
 @Composable
-fun NombreFiel(nombre: String, onTextFieldChanged:(String) -> Unit) {
+fun NombreField(nombre: String, onTextFieldChanged:(String) -> Unit) {
     TextField(
         value = nombre,
         onValueChange = {onTextFieldChanged(it)},
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text(text = "Nombre") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        singleLine = true, // Para que al hacer enter no se amplie
-        maxLines = 1, // Admite una sola linea
+        singleLine = true,
+        maxLines = 1,
         shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.colors(
             focusedTextColor = Color(0xFF636262),
@@ -149,8 +159,8 @@ fun EmailField(email: String, onTextFieldChanged:(String) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text(text = "Email") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        singleLine = true, // Para que al hacer enter no se amplie
-        maxLines = 1, // Admite una sola linea
+        singleLine = true,
+        maxLines = 1,
         shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.colors(
             focusedTextColor = Color(0xFF636262),
@@ -172,8 +182,8 @@ fun PasswordField(password: String, onTextFieldChanged:(String)-> Unit) {
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text(text = "Password") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        singleLine = true, // Para que al hacer enter no se amplie
-        maxLines = 1, // Admite una sola linea
+        singleLine = true,
+        maxLines = 1,
         shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.colors(
             focusedTextColor = Color(0xFF636262),
@@ -193,10 +203,10 @@ fun RepeatPasswordField(repeatPass: String, onTextFieldChanged: (String) -> Unit
         value = repeatPass,
         onValueChange = {onTextFieldChanged(it)},
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text(text = "Password") },
+        placeholder = { Text(text = "Repetir Password") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        singleLine = true, // Para que al hacer enter no se amplie
-        maxLines = 1, // Admite una sola linea
+        singleLine = true,
+        maxLines = 1,
         shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.colors(
             focusedTextColor = Color(0xFF636262),
