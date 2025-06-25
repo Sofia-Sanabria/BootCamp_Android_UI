@@ -2,22 +2,37 @@ package com.example.app_games_android.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.app_games_android.ui.login.LoginScreen
+import androidx.navigation.compose.rememberNavController
+import com.example.app_games_android.ui.login.ui.LoginViewModel
+import com.example.app_games_android.ui.login.ui.LoginScreen
 import com.example.app_games_android.ui.login.ui.RegistroScreen
 import com.example.app_games_android.ui.login.ui.RegistroViewModel
+import com.example.app_games_android.ui.home.ui.HomeScreen
 
 @Composable
-fun AppNavigation(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "login") {
-        composable("login") {
-            LoginScreen(navController = navController)
+fun AppNavigation() {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = Screens.Login.route) {
+        composable(route = Screens.Login.route) {
+            val loginViewModel: LoginViewModel = viewModel()
+            LoginScreen(
+                { navController.navigate(Screens.Registro.route) },
+                { navController.navigate(Screens.Home.route) },
+                loginViewModel
+            )
         }
-        composable("registro") {
+
+        composable(route = Screens.Registro.route) {
             val registroViewModel: RegistroViewModel = viewModel()
-            RegistroScreen(navController = navController, viewModel = registroViewModel)
+            RegistroScreen(registroViewModel)
+        }
+
+        composable(route = Screens.Home.route) {
+            HomeScreen()
         }
     }
 }
+

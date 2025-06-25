@@ -1,4 +1,4 @@
-package com.example.app_games_android.ui.login
+package com.example.app_games_android.ui.login.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,12 +35,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = viewModel()) {
+fun LoginScreen(navigateToHome: () -> Unit, navigateToRegister: () -> Unit, loginViewModel: LoginViewModel = viewModel()) {
     // Traigo los datos del ViewModel (email, password, si el login está habilitado y si está cargando)
     val email: String by loginViewModel.email.observeAsState("")
     val password: String by loginViewModel.password.observeAsState("")
@@ -108,6 +107,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                 // Botón para iniciar sesion
                 Button(
                     onClick = {
+                        navigateToHome()
                         coroutineScope.launch {
                             // Llamo al ViewModel para procesar el login
                             loginViewModel.onLoginSelected { success ->
@@ -134,7 +134,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text("¿No tienes una cuenta?")
-                TextButton(onClick = { navController.navigate("registro")  }) {
+                TextButton(onClick = { navigateToRegister()  }) {
                     Text("Registrarse")
                     }
                 }

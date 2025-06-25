@@ -1,4 +1,4 @@
-package com.example.app_games_android.ui.login
+package com.example.app_games_android.ui.login.ui
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

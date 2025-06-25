@@ -7,14 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.rememberNavController
 import com.example.app_games_android.navigation.AppNavigation
-import com.example.app_games_android.ui.login.LoginScreen
-import com.example.app_games_android.ui.login.LoginViewModel
-import com.example.app_games_android.ui.login.ui.RegistroScreen
-import com.example.app_games_android.ui.login.ui.RegistroViewModel
 import com.example.app_games_android.ui.theme.App_Games_AndroidTheme
 
 
@@ -28,20 +22,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController()
-                    AppNavigation(navController = navController)
+                    AppNavigation()
                 }
             }
         }
     }
 }
-
-    @Composable
-    fun GreetingPreview() {
-        App_Games_AndroidTheme {
-            LoginScreen(
-                loginViewModel = LoginViewModel(),
-                navController = navViewController
-            )
-        }
-    }

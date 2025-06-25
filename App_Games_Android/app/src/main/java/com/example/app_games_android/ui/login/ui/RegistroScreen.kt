@@ -28,12 +28,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.app_games_android.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun RegistroScreen(viewModel: RegistroViewModel, navController: NavHostController) {
+fun RegistroScreen(viewModel: RegistroViewModel) {
     Box(
         Modifier
             .fillMaxSize()
