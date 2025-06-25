@@ -32,18 +32,21 @@ import com.example.app_games_android.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun RegistroScreen(viewModel: RegistroViewModel) {
+fun RegistroScreen(
+    registroViewModel: RegistroViewModel,
+    onBackToLogin: () -> Unit             // Volver atrás al Login
+){
     Box(
         Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Registro(Modifier.align(Alignment.Center), viewModel)
+        Registro( Modifier.align(Alignment.Center), registroViewModel, onBackToLogin)
     }
 }
 
 @Composable
-fun Registro(modifier: Modifier, viewModel: RegistroViewModel) {
+fun Registro(modifier: Modifier, viewModel: RegistroViewModel, onBackToLogin: () -> Unit  ) {
 
     // Observa los estados del ViewModel usando LiveData con Compose
     val nombre: String by viewModel.nombre.observeAsState(initial = "")
@@ -84,6 +87,13 @@ fun Registro(modifier: Modifier, viewModel: RegistroViewModel) {
                 coroutineScope.launch {
                     viewModel.onRegistroSelected()
                 }
+            }
+
+            Spacer(modifier = Modifier.padding(16.dp))
+
+            // Boton para ir al inicio de Sesion
+            Button(onClick = { onBackToLogin() }) {
+                Text(text = "Ir a Login")
             }
         }
     }

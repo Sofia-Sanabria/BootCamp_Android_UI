@@ -39,7 +39,12 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun LoginScreen(navigateToHome: () -> Unit, navigateToRegister: () -> Unit, loginViewModel: LoginViewModel = viewModel()) {
+fun LoginScreen(
+    onLoginSuccess: (String) -> Unit,     // Navega a Home con el nombre
+    onNavigateToRegister: () -> Unit,     // Navega a Registro
+    loginViewModel: LoginViewModel  = viewModel()
+) {
+
     // Traigo los datos del ViewModel (email, password, si el login está habilitado y si está cargando)
     val email: String by loginViewModel.email.observeAsState("")
     val password: String by loginViewModel.password.observeAsState("")
@@ -48,8 +53,12 @@ fun LoginScreen(navigateToHome: () -> Unit, navigateToRegister: () -> Unit, logi
 
     // Para lanzar corutinas cuando toque hacer login
     val coroutineScope = rememberCoroutineScope()
+
     // variable para controlar la visibilidad
     var passwordVisible by remember { mutableStateOf(false) }
+
+    // Variable para pasar el nombre del jugador
+    var text by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -72,6 +81,16 @@ fun LoginScreen(navigateToHome: () -> Unit, navigateToRegister: () -> Unit, logi
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                TextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    label = { Text("Nombre de usuario") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Campo para ingresar email
                 TextField(
@@ -107,13 +126,13 @@ fun LoginScreen(navigateToHome: () -> Unit, navigateToRegister: () -> Unit, logi
                 // Botón para iniciar sesion
                 Button(
                     onClick = {
-                        navigateToHome()
                         coroutineScope.launch {
                             // Llamo al ViewModel para procesar el login
                             loginViewModel.onLoginSelected { success ->
                                 if (success) {
                                     // Acá podes mostrar mensaje o navegar a otra pantalla
                                     println("Login Exitoso")
+                                    onLoginSuccess(text)
                                 } else {
                                     // Mostrar error si falla login
                                     println("Login error")
@@ -134,7 +153,7 @@ fun LoginScreen(navigateToHome: () -> Unit, navigateToRegister: () -> Unit, logi
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text("¿No tienes una cuenta?")
-                TextButton(onClick = { navigateToRegister()  }) {
+                TextButton(onClick = { onNavigateToRegister()  }) {
                     Text("Registrarse")
                     }
                 }
