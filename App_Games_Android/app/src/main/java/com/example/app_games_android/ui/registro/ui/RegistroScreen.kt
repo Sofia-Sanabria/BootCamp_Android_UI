@@ -1,4 +1,4 @@
-package com.example.app_games_android.ui.login.ui
+package com.example.app_games_android.ui.registro.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -20,7 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import  androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,12 +32,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.app_games_android.R
+import com.example.app_games_android.viewmodel.RegistroViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun RegistroScreen(
     registroViewModel: RegistroViewModel,
-    onBackToLogin: () -> Unit             // Volver atrás al Login
+    onBackToLogin: () -> Unit
 ){
     Box(
         Modifier
@@ -46,15 +50,23 @@ fun RegistroScreen(
 }
 
 @Composable
-fun Registro(modifier: Modifier, viewModel: RegistroViewModel, onBackToLogin: () -> Unit  ) {
+fun Registro(modifier: Modifier, registroViewModel: RegistroViewModel, onBackToLogin: () -> Unit  ) {
 
     // Observa los estados del ViewModel usando LiveData con Compose
-    val nombre: String by viewModel.nombre.observeAsState(initial = "")
-    val email: String by viewModel.email.observeAsState(initial = "")
-    val password: String by viewModel.password.observeAsState(initial = "")
-    val repeatPass: String by viewModel.repeatPass.observeAsState(initial = "")
-    val registroEnable: Boolean by viewModel.registroEnable.observeAsState(initial = false) // El boton inicia deshabilitado
-    val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
+    val nombre: String by registroViewModel.nombre.observeAsState(initial = "")
+    val email: String by registroViewModel.email.observeAsState(initial = "")
+    val password: String by registroViewModel.password.observeAsState(initial = "")
+    val repeatPass: String by registroViewModel.repeatPass.observeAsState(initial = "")
+    val isLoading: Boolean by registroViewModel.isLoading.observeAsState(initial = false)
+
+    // Observar los errores de cada Text Field
+    val nombreError by registroViewModel.nombreError.observeAsState()
+    val emailError by registroViewModel.emailError.observeAsState()
+    val passwordError by registroViewModel.passwordError.observeAsState()
+    val repeatPassError by registroViewModel.repeatPassError.observeAsState()
+
+    // Verifica si el usuario ya se registro
+    var seRegistro by remember { mutableStateOf(false) }
 
     // Scope para lanzar corrutinas desde Compose
     val coroutineScope = rememberCoroutineScope()
@@ -73,35 +85,47 @@ fun Registro(modifier: Modifier, viewModel: RegistroViewModel, onBackToLogin: ()
             Spacer(modifier = Modifier.padding(16.dp))
 
             // Campos del formulario: actualizan el estado en el ViewModel
-            NombreField(nombre) {viewModel.onRegistroChanged(it, email, password, repeatPass)}
+            NombreField(nombre, nombreError) {registroViewModel.onRegistroChanged(it, email, password, repeatPass)}
             Spacer(modifier = Modifier.padding(4.dp))
-            EmailField(email) {viewModel.onRegistroChanged(nombre, it, password, repeatPass)}
+            EmailField(email, emailError) {registroViewModel.onRegistroChanged(nombre, it, password, repeatPass)}
             Spacer(modifier = Modifier.padding(4.dp))
-            PasswordField(password) {viewModel.onRegistroChanged(nombre, email, it, repeatPass)}
+            PasswordField(password, passwordError) {registroViewModel.onRegistroChanged(nombre, email, it, repeatPass)}
             Spacer(modifier = Modifier.padding(4.dp))
-            RepeatPasswordField(repeatPass) {viewModel.onRegistroChanged(nombre, email, password, it)}
+            RepeatPasswordField(repeatPass, repeatPassError) {registroViewModel.onRegistroChanged(nombre, email, password, it)}
             Spacer(modifier = Modifier.padding(16.dp))
 
             // Botón de "Registrarse" que sigue un hilo
-            RegistroButton(registroEnable) {
+            RegistroButton() {
                 coroutineScope.launch {
-                    viewModel.onRegistroSelected()
+                    registroViewModel.validarCampos()
+                    registroViewModel.onRegistroSelected()
+                    seRegistro = true
                 }
             }
 
             Spacer(modifier = Modifier.padding(16.dp))
 
             // Boton para ir al inicio de Sesion
-            Button(onClick = { onBackToLogin() }) {
-                Text(text = "Ir a Login")
+            if(seRegistro) {
+                Button(
+                    onClick = { onBackToLogin() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF0D7E0D),
+                        contentColor = Color.White
+                    )
+                ){
+                    Text(text = "Ir a Login")
+                }
             }
         }
     }
 }
 
-// Botón que se habilita solo si todos los datos son válidos
 @Composable
-fun RegistroButton(registroEnable: Boolean, onRegistroSelected: () -> Unit) {
+fun RegistroButton( onRegistroSelected: () -> Unit ) {
     Button(
         onClick = { onRegistroSelected() },
         modifier = Modifier
@@ -112,7 +136,7 @@ fun RegistroButton(registroEnable: Boolean, onRegistroSelected: () -> Unit) {
             disabledContainerColor = Color(0xFF77BD6E),
             contentColor = Color.White,
             disabledContentColor = Color.White
-        ), enabled = registroEnable // se habilita según el estado
+        )
     ) {
         Text(text = "Registrarse")
     }
@@ -138,7 +162,7 @@ fun HeaderImage(modifier: Modifier) {
 }
 
 @Composable
-fun NombreField(nombre: String, onTextFieldChanged:(String) -> Unit) {
+fun NombreField(nombre: String, nombreError: String?, onTextFieldChanged:(String) -> Unit) {
     TextField(
         value = nombre,
         onValueChange = {onTextFieldChanged(it)},
@@ -158,10 +182,17 @@ fun NombreField(nombre: String, onTextFieldChanged:(String) -> Unit) {
             focusedLeadingIconColor = Color.DarkGray
         )
     )
+    if (nombreError != null) {
+        Text(
+            text = nombreError,
+            color = Color.Red,
+            fontSize = 12.sp
+        )
+    }
 }
 
 @Composable
-fun EmailField(email: String, onTextFieldChanged:(String) -> Unit) {
+fun EmailField(email: String, emailError: String?, onTextFieldChanged:(String) -> Unit) {
     TextField(
         value = email,
         onValueChange = {onTextFieldChanged(it)},
@@ -181,10 +212,17 @@ fun EmailField(email: String, onTextFieldChanged:(String) -> Unit) {
             focusedLeadingIconColor = Color.DarkGray
         )
     )
+    if (emailError != null) {
+        Text(
+            text = emailError,
+            color = Color.Red,
+            fontSize = 12.sp
+        )
+    }
 }
 
 @Composable
-fun PasswordField(password: String, onTextFieldChanged:(String)-> Unit) {
+fun PasswordField(password: String, passwordError: String?, onTextFieldChanged:(String)-> Unit) {
     TextField(
         value = password,
         onValueChange = {onTextFieldChanged(it)},
@@ -204,10 +242,17 @@ fun PasswordField(password: String, onTextFieldChanged:(String)-> Unit) {
             focusedLeadingIconColor = Color.DarkGray
         )
     )
+    if (passwordError != null) {
+        Text(
+            text = passwordError,
+            color = Color.Red,
+            fontSize = 12.sp
+        )
+    }
 }
 
 @Composable
-fun RepeatPasswordField(repeatPass: String, onTextFieldChanged: (String) -> Unit) {
+fun RepeatPasswordField(repeatPass: String, repeatError: String?, onTextFieldChanged: (String) -> Unit) {
     TextField(
         value = repeatPass,
         onValueChange = {onTextFieldChanged(it)},
@@ -227,6 +272,14 @@ fun RepeatPasswordField(repeatPass: String, onTextFieldChanged: (String) -> Unit
             focusedLeadingIconColor = Color.DarkGray
         )
     )
+
+    if (repeatError != null) {
+        Text(
+            text = repeatError,
+            color = Color.Red,
+            fontSize = 12.sp
+        )
+    }
 }
 
 

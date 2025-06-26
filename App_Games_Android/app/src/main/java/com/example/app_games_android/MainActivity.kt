@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.app_games_android.navigation.AppNavigation
 import com.example.app_games_android.ui.theme.App_Games_AndroidTheme
+import retrofit2.Retrofit
 
 
 class MainActivity : ComponentActivity() {
@@ -27,4 +28,5 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 }

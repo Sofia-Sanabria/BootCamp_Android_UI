@@ -1,10 +1,16 @@
-package com.example.app_games_android.ui.login.ui
+package com.example.app_games_android.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
+import androidx.lifecycle.viewModelScope
+import com.example.app_games_android.data.model.Usuario
+import com.example.app_games_android.repository.AuthRepository
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class LoginViewModel : ViewModel() {
@@ -20,6 +26,35 @@ class LoginViewModel : ViewModel() {
 
     private val _isLoading = MutableLiveData<Boolean>(false)
     val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _mensaje = MutableStateFlow("") // Mensaje privado mutable
+    val mensaje: StateFlow<String> = _mensaje   // Mensaje expuesto como solo lectura
+
+    fun setEmail(value: String) {
+        _email.value = value
+    }
+
+    fun setPassword(value: String) {
+        _password.value = value
+    }
+
+    // Intenta iniciar sesión con credenciales
+    fun login(email: String, password: String) {
+        viewModelScope.launch {
+            val res = AuthRepository.login(Usuario(email, password))
+            _mensaje.value = res.fold(
+                onSuccess = { "Login exitoso" },
+                onFailure = { "Error al iniciar sesión: ${it.message}" }
+            )
+        }
+    }
+
+    // Funcion para limpiar los campos al hacer back a Login
+    fun limpiarCampos() {
+        _email.value = ""
+        _password.value = ""
+    }
+
 
     // Actualiza los campos y valida si el login puede activarse
     fun onLoginChanged(email: String, password: String) {

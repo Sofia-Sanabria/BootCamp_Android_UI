@@ -3,7 +3,6 @@ package com.example.app_games_android.ui.login.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,11 +29,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.app_games_android.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
 
 
@@ -42,7 +44,7 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     onLoginSuccess: (String) -> Unit,     // Navega a Home con el nombre
     onNavigateToRegister: () -> Unit,     // Navega a Registro
-    loginViewModel: LoginViewModel  = viewModel()
+    loginViewModel: LoginViewModel = viewModel()
 ) {
 
     // Traigo los datos del ViewModel (email, password, si el login está habilitado y si está cargando)
@@ -77,11 +79,14 @@ fun LoginScreen(
                 Text(
                     text = "LOGIN",
                     style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF0D407E)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Campo para ingresar nombre
                 TextField(
                     value = text,
                     onValueChange = { text = it },
@@ -148,15 +153,20 @@ fun LoginScreen(
                 //agrego boton de registrarse y texto
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(
+                Box(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text("¿No tienes una cuenta?")
-                TextButton(onClick = { onNavigateToRegister()  }) {
-                    Text("Registrarse")
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("¿No tienes una cuenta?")
+                        TextButton(onClick = { onNavigateToRegister() }) {
+                            Text("Registrarse")
+                        }
                     }
                 }
+
             }
         }
     }

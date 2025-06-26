@@ -7,10 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.app_games_android.ui.login.ui.LoginViewModel
+import com.example.app_games_android.viewmodel.LoginViewModel
 import com.example.app_games_android.ui.login.ui.LoginScreen
-import com.example.app_games_android.ui.login.ui.RegistroScreen
-import com.example.app_games_android.ui.login.ui.RegistroViewModel
+import com.example.app_games_android.ui.registro.ui.RegistroScreen
+import com.example.app_games_android.viewmodel.RegistroViewModel
 import com.example.app_games_android.ui.home.ui.HomeScreen
 import com.example.app_games_android.ui.poker.ui.PokerScreen
 import com.example.app_games_android.ui.tocame.ui.TocameScreen
@@ -56,7 +56,12 @@ fun AppNavigation() {
             arguments = listOf(navArgument("name") { type = NavType.StringType })
         ) { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name") ?: ""
-            HomeScreen(name = name, navController)
+            val loginViewModel: LoginViewModel = viewModel()
+            HomeScreen(
+                name = name,
+                navController = navController,
+                loginViewModel = loginViewModel
+            )
         }
 
         composable("poker") { PokerScreen() }
