@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
 import androidx.lifecycle.viewModelScope
+import com.example.app_games_android.data.model.Metadata
 import com.example.app_games_android.data.model.Usuario
 import com.example.app_games_android.repository.AuthRepository
 import kotlin.time.Duration.Companion.seconds
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 class RegistroViewModel: ViewModel() {
 
     // LiveData para almacenar los campos del formulario
-    private val _nombre = MutableLiveData<String>("")
+    private val _nombre = MutableLiveData("")
     val nombre: LiveData<String> = _nombre // ':' siginifica, de tipo ...
 
     private val _email = MutableLiveData("")
@@ -36,12 +37,18 @@ class RegistroViewModel: ViewModel() {
     val mensaje: StateFlow<String> = _mensaje   // Mensaje expuesto como solo lectura
 
     // Intenta registrar un nuevo usuario
-    fun registrar(email: String, password: String) {
+    fun registrar(nombre: String, email: String, password: String) {
         viewModelScope.launch {
-            val res = AuthRepository.registrar(Usuario(email, password))
+            val usuario = Usuario(
+                email = email,
+                password = password,
+                data = Metadata(nombre = nombre) // Incluimos nombre como metadata
+            )
+
+            val res = AuthRepository.registrar(usuario)
             _mensaje.value = res.fold(
-                onSuccess = { "Registro exitoso" },
-                onFailure = { "Error al registrar: ${it.message}" }
+                onSuccess = { "Registro Exitoso"},
+                onFailure = {  "Error al registrar: ${it.message}" }
             )
         }
     }
@@ -84,6 +91,17 @@ class RegistroViewModel: ViewModel() {
     fun isValidPassword(password: String): Boolean = password.length > 6
 
     fun isValidRepeatPass(repeatPass: String): Boolean = repeatPass == _password.value && repeatPass.length > 6
+
+    /**
+     * Funcion para limpiar los campos
+     */
+    fun limpiarCampos() {
+        _nombre.value = ""
+        _email.value = ""
+        _password.value = ""
+        _repeatPass.value = ""
+    }
+
 
     /**
      * Funcion para validar todos los campos

@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.app_games_android.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
@@ -48,8 +50,10 @@ fun LoginScreen(
 ) {
 
     // Traigo los datos del ViewModel (email, password, si el login está habilitado y si está cargando)
-    val email: String by loginViewModel.email.observeAsState("")
-    val password: String by loginViewModel.password.observeAsState("")
+    val email by loginViewModel.email.collectAsState()
+    val password by loginViewModel.password.collectAsState()
+    val mensaje by loginViewModel.mensaje.collectAsState()
+
     val loginEnabled: Boolean by loginViewModel.loginEnabled.observeAsState(false)
     val isLoading: Boolean by loginViewModel.isLoading.observeAsState(false)
 
@@ -58,9 +62,6 @@ fun LoginScreen(
 
     // variable para controlar la visibilidad
     var passwordVisible by remember { mutableStateOf(false) }
-
-    // Variable para pasar el nombre del jugador
-    var text by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -84,23 +85,12 @@ fun LoginScreen(
                     color = Color(0xFF0D407E)
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Campo para ingresar nombre
-                TextField(
-                    value = text,
-                    onValueChange = { text = it },
-                    label = { Text("Nombre de usuario") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Campo para ingresar email
                 TextField(
                     value = email,
-                    onValueChange = { loginViewModel.onLoginChanged(it, password) },
+                    onValueChange = { loginViewModel.onLoginChanged(it, password)},
                     label = { Text("Email") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true,
@@ -112,7 +102,7 @@ fun LoginScreen(
                 // Campo para ingresar contraseña
                 TextField(
                     value = password,
-                    onValueChange = { loginViewModel.onLoginChanged(email, it) },
+                    onValueChange = { loginViewModel.onLoginChanged(email, it)},
                     label = { Text("Password") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
@@ -128,28 +118,36 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botón para iniciar sesion
+                // Botón para iniciar sesión
                 Button(
                     onClick = {
                         coroutineScope.launch {
-                            // Llamo al ViewModel para procesar el login
-                            loginViewModel.onLoginSelected { success ->
+                            loginViewModel.login { success ->
                                 if (success) {
-                                    // Acá podes mostrar mensaje o navegar a otra pantalla
-                                    println("Login Exitoso")
-                                    onLoginSuccess(text)
-                                } else {
-                                    // Mostrar error si falla login
-                                    println("Login error")
+                                    val nombre = loginViewModel.nombre.value
+                                    onLoginSuccess(nombre)
                                 }
                             }
                         }
                     },
-                    enabled = loginEnabled,
-                    modifier = Modifier.fillMaxWidth()
+                    // Habilitado solo si hay texto
+                    enabled = email.isNotBlank() && password.isNotBlank(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
                 ) {
                     Text("Iniciar Sesión")
                 }
+
+
+                // Mostrar mensaje
+                Text(
+                    text = mensaje,
+                    color = if (mensaje.startsWith("Error")) Color.Red else Color.Green,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+
                 //agrego boton de registrarse y texto
                 Spacer(modifier = Modifier.height(16.dp))
 

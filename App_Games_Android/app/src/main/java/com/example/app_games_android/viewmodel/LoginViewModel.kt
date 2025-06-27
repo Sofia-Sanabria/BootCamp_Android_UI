@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
 import androidx.lifecycle.viewModelScope
-import com.example.app_games_android.data.model.Usuario
 import com.example.app_games_android.repository.AuthRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,36 +14,42 @@ import kotlinx.coroutines.runBlocking
 
 class LoginViewModel : ViewModel() {
 
-    private val _email = MutableLiveData<String>()
-    val email: LiveData<String> = _email
+    private val _nombre = MutableStateFlow("")
+    val nombre: StateFlow<String> = _nombre
 
-    private val _password = MutableLiveData<String>()
-    val password: LiveData<String> = _password
+    private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
 
-    private val _loginEnabled = MutableLiveData<Boolean>(false)
+    private val _password = MutableStateFlow("")
+    val password: StateFlow<String> = _password
+
+    private val _loginEnabled = MutableLiveData(false)
     val loginEnabled: LiveData<Boolean> = _loginEnabled
 
-    private val _isLoading = MutableLiveData<Boolean>(false)
+    private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
     private val _mensaje = MutableStateFlow("") // Mensaje privado mutable
     val mensaje: StateFlow<String> = _mensaje   // Mensaje expuesto como solo lectura
 
-    fun setEmail(value: String) {
-        _email.value = value
-    }
-
-    fun setPassword(value: String) {
-        _password.value = value
-    }
-
-    // Intenta iniciar sesión con credenciales
-    fun login(email: String, password: String) {
+    fun login(onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
-            val res = AuthRepository.login(Usuario(email, password))
+            // Pasar parametros para la autenticacion
+            val res = AuthRepository.login(_email.value, _password.value)
+
             _mensaje.value = res.fold(
-                onSuccess = { "Login exitoso" },
-                onFailure = { "Error al iniciar sesión: ${it.message}" }
+                onSuccess = {
+                    // Extraer nombre de user_metadata del Map
+                    val nombreUsuario = (it.user?.get("user_metadata") as? Map<*, *>)?.get("nombre") as? String
+                    _nombre.value = nombreUsuario ?: "Usuario"
+
+                    onResult(true)
+                    "Login exitoso"
+                },
+                onFailure = {
+                    onResult(false)
+                    "Error al iniciar sesión: ${it.message}"
+                }
             )
         }
     }
@@ -54,7 +59,6 @@ class LoginViewModel : ViewModel() {
         _email.value = ""
         _password.value = ""
     }
-
 
     // Actualiza los campos y valida si el login puede activarse
     fun onLoginChanged(email: String, password: String) {

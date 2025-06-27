@@ -18,6 +18,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import  androidx.compose.runtime.mutableStateOf
@@ -65,6 +66,9 @@ fun Registro(modifier: Modifier, registroViewModel: RegistroViewModel, onBackToL
     val passwordError by registroViewModel.passwordError.observeAsState()
     val repeatPassError by registroViewModel.repeatPassError.observeAsState()
 
+    val estado by registroViewModel.mensaje.collectAsState()
+
+
     // Verifica si el usuario ya se registro
     var seRegistro by remember { mutableStateOf(false) }
 
@@ -98,12 +102,22 @@ fun Registro(modifier: Modifier, registroViewModel: RegistroViewModel, onBackToL
             RegistroButton() {
                 coroutineScope.launch {
                     registroViewModel.validarCampos()
+                    registroViewModel.registrar(nombre, email, password)
+                    registroViewModel.limpiarCampos()
                     registroViewModel.onRegistroSelected()
                     seRegistro = true
                 }
+
             }
 
-            Spacer(modifier = Modifier.padding(16.dp))
+            Text(
+                text = estado,
+                color = if (estado.startsWith("Error")) Color.Red else Color(0xFF0D7E0D),
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 8.dp, bottom = 8.dp)
+            )
 
             // Boton para ir al inicio de Sesion
             if(seRegistro) {
@@ -133,9 +147,7 @@ fun RegistroButton( onRegistroSelected: () -> Unit ) {
             .height(48.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFF0D7E0D),
-            disabledContainerColor = Color(0xFF77BD6E),
-            contentColor = Color.White,
-            disabledContentColor = Color.White
+            contentColor = Color.White
         )
     ) {
         Text(text = "Registrarse")

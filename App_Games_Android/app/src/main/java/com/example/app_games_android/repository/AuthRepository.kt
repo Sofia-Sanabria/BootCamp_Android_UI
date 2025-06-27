@@ -14,10 +14,12 @@ object AuthRepository {
         Result.failure(e) // Si algo falla, devuelve el error
     }
 
-    suspend fun login(usuario: Usuario): Result<RespuestaAuth> = try {
-        val respuesta = RetrofitClient.authApi.login(usuario)
+    suspend fun login(email: String, password: String): Result<RespuestaAuth> = try {
+        val body = mapOf("email" to email, "password" to password)
+        val respuesta = RetrofitClient.authApi.login(body)
         Result.success(respuesta)
     } catch (e: Exception) {
         Result.failure(e)
     }
+
 }
