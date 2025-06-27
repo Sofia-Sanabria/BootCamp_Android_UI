@@ -103,7 +103,6 @@ fun Registro(modifier: Modifier, registroViewModel: RegistroViewModel, onBackToL
                 coroutineScope.launch {
                     registroViewModel.validarCampos()
                     registroViewModel.registrar(nombre, email, password)
-                    registroViewModel.limpiarCampos()
                     registroViewModel.onRegistroSelected()
                     seRegistro = true
                 }

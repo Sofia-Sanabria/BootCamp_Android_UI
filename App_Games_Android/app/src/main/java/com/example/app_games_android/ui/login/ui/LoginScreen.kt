@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -62,6 +63,11 @@ fun LoginScreen(
 
     // variable para controlar la visibilidad
     var passwordVisible by remember { mutableStateOf(false) }
+
+    // Se asegura de recomponer todos los campos de login
+    LaunchedEffect(Unit) {
+        loginViewModel.limpiarCampos()
+    }
 
     Box(
         modifier = Modifier

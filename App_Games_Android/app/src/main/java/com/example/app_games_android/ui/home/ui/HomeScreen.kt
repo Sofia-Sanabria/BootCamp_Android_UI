@@ -240,14 +240,16 @@ fun JugarButton(onClick: () -> Unit) {
 fun PuntajeButton() {
     Button(
         onClick = { /* A implementar */ },
-        modifier = Modifier.height(48.dp),
+        modifier = Modifier
+            .width(180.dp)
+            .height(48.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFFFF9800),
             contentColor = Color.White,
         )
     ) {
         Text(
-            text = "Puntaje",
+            text = "Puntajes",
             fontSize = 20.sp,
         )
     }
@@ -261,7 +263,9 @@ fun AyudaButton(juegoActual: Int) {
 
     Button(
         onClick = { mostrarDialogo = true },
-        modifier = Modifier.height(48.dp),
+        modifier = Modifier
+            .width(180.dp)
+            .height(48.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFFFF9800),
             contentColor = Color.White,

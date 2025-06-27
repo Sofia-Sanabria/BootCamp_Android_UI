@@ -58,6 +58,8 @@ class LoginViewModel : ViewModel() {
     fun limpiarCampos() {
         _email.value = ""
         _password.value = ""
+        _nombre.value = ""
+        _mensaje.value = ""
     }
 
     // Actualiza los campos y valida si el login puede activarse
