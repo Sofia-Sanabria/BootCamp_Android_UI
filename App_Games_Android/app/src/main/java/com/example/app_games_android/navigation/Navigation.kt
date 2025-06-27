@@ -59,7 +59,7 @@ fun AppNavigation() {
             HomeScreen(name = name, navController)
         }
 
-        composable("poker") { PokerScreen() }
+        composable("poker") { PokerScreen(nombreJugador = String.toString()) }
         composable("tocame") { TocameScreen() }
     }
 }
