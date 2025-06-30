@@ -9,14 +9,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.app_games_android.navigation.AppNavigation
-import com.example.app_games_android.ui.theme.App_Games_AndroidTheme
+import com.example.app_games_android.ui.theme.AppGamesAndroidTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            App_Games_AndroidTheme {
+            AppGamesAndroidTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

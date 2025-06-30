@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app_games_android.R
+import com.example.app_games_android.navigation.Screens
 import com.example.app_games_android.viewmodel.LoginViewModel
 
 @Composable
@@ -77,8 +78,8 @@ fun HomeScreen(name: String, navController: NavHostController, loginViewModel: L
         if (pagerState.currentPage != 0) {
             JugarButton(onClick = {
                 when (pagerState.currentPage) {
-                    1 -> navController.navigate("poker")
-                    2 -> navController.navigate("tocame")
+                    1 -> navController.navigate(Screens.Poker.createRoute(name))
+                    2 -> navController.navigate(Screens.Tocame.createRoute(name))
                 }
             })
         }

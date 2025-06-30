@@ -64,8 +64,24 @@ fun AppNavigation() {
             )
         }
 
-        composable("poker") { PokerScreen() }
-        composable("tocame") { TocameScreen() }
+        // Pantalla de Tocame con argumento 'name'
+        composable(
+            route = Screens.Tocame.route,
+            arguments = listOf(navArgument("name") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name") ?: ""
+            TocameScreen(jugadorNombre = name, navController = navController)
+        }
+
+        // Pantalla de Poker con argumento 'name'
+        composable(
+            route = Screens.Poker.route,
+            arguments = listOf(navArgument("name") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name") ?: ""
+            PokerScreen(jugadorNombre = name, navController = navController)
+        }
     }
+
 }
 

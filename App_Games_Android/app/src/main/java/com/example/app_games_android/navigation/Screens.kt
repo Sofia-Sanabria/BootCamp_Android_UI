@@ -10,4 +10,12 @@ sealed class Screens(val route: String) {
     data object Home : Screens("home/{name}") {
         fun createRoute(name: String) = "home/$name"
     }
+
+    data object Tocame : Screens("tocame/{name}") {
+        fun createRoute(name: String) = "tocame/$name"
+    }
+
+    data object Poker : Screens("poker/{name}") {
+        fun createRoute(name: String) = "poker/$name"
+    }
 }
