@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.CountDownTimer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,8 +18,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +49,7 @@ import androidx.navigation.NavController
 
 @Composable
 fun TocameScreen(
-    jugadorNombre: String,
+    name: String,
     navController: NavController
 ) {
     // Estado para el puntaje actual
@@ -56,140 +61,192 @@ fun TocameScreen(
     // Estado para saber si el juego está activo
     var juegoActivo by remember { mutableStateOf(false) }
 
-    // Controlador del temporizador
-    var timer: CountDownTimer? by remember { mutableStateOf(null) }
-
+    // Guardamos la referencia del temporizador para poder cancelarlo
+    val timer = remember { mutableStateOf<CountDownTimer?>(null) }
     // Tamaño del área de juego
     val context = LocalContext.current
     val density = LocalDensity.current
 
-    // Estado para la posición del osito
-    var posX by remember { mutableFloatStateOf(100f) }
-    var posY by remember { mutableFloatStateOf(100f) }
+    val anchoJuego = 300.dp
+    val altoJuego = 600.dp
+
+    var posX by remember { mutableFloatStateOf(0f) }
+    var posY by remember { mutableFloatStateOf(0f) }
 
     // Crear imagen del osito como recurso
     val osito = painterResource(id = R.drawable.osito_img)
 
-    // Efecto cuando empieza el juego
-    LaunchedEffect(juegoActivo) {
-        if (juegoActivo) {
-            // Reiniciar el puntaje y el tiempo
-            puntaje = 0
-            tiempo = 10
-
-            // Iniciar el temporizador
-            timer = object : CountDownTimer(10000, 1000) {
-                override fun onTick(millisUntilFinished: Long) {
-                    tiempo--
-                }
-
-                override fun onFinish() {
-                    juegoActivo = false
-                    timer?.cancel()
-                    timer = null
-
-                    // Lógica para enviar el puntaje y mostrar alerta
-                    mostrarAlertaFinJuego(context, jugadorNombre, puntaje, navController)
-                }
-            }.start()
-        }
+    @Composable
+    fun NombreJugador(name: String) {
+        Text(
+            text = name,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Magenta
+        )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = 40.dp, horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    @Composable
+    fun PuntajeJugador(puntaje: Int) {
+        Text(
+            text = "$puntaje",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Magenta
+        )
+    }
+
+    @Composable
+    fun TiempoJuego(tiempo: Int) {
+        Text(
+            text = "$tiempo",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Magenta
+        )
+    }
+
+    @Composable
+    fun TablaDeJuego(
+        ancho: Dp = 300.dp,
+        alto: Dp = 400.dp,
+        ositoX: Float,
+        ositoY: Float,
+        onOsitoTocado: () -> Unit
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 25.dp)
-        ) {
-            // Mostrar nombre del jugador
-            Text(
-                text = jugadorNombre,
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            // Mostrar puntaje
-            Text(
-                text = "Puntaje: $puntaje",
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold
-
-            )
-
-            // Mostrar tiempo
-            Text(
-                text = "Tiempo: $tiempo",
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
         Box(
             modifier = Modifier
-                .size(50.dp)
-                .background(Color(0xFFFFC0CB))
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp)
+                .size(width = ancho, height = alto) // Fija el tamaño del área
+                .background(Color(0xFFFFF0F5))       // Color rosado bebé
+                .border(2.dp, Color.Magenta)         // Opcional: borde para ver el área
+                .clip(RoundedCornerShape(16.dp))     // Bordes redondeados
+                .padding(8.dp)
         ) {
-            // Botón de iniciar juego
-            Button(
-                onClick = { juegoActivo = true },
-                enabled = !juegoActivo,
-            ) {
-                Text(
-                    "Iniciar Juego"
-                )
-            }
-
-            // Imagen del osito (solo se ve si el juego está activo)
-            if (juegoActivo) {
+            if(juegoActivo) {
                 Image(
                     painter = osito,
                     contentDescription = "Osito",
                     modifier = Modifier
-                        .size(80.dp)
-                        .offset { IntOffset(posX.toInt(), posY.toInt()) }
+                        .size(70.dp)
+                        .offset { IntOffset(ositoX.toInt(), ositoY.toInt()) }
                         .clip(CircleShape)
                         .background(Color.White)
-                        .clickable {
-                            // Aumentar puntaje al tocar el osito
-                            puntaje++
+                        .clickable { onOsitoTocado() }
+                )
+            }
+        }
+    }
 
-                            // Calcular nueva posición aleatoria
-                            val maxX = context.resources.displayMetrics.widthPixels - 200
-                            val maxY = context.resources.displayMetrics.heightPixels - 400
+    fun iniciarJuego() {
+        if (juegoActivo) return // evitar múltiples inicios
 
-                            posX = (0..maxX).random().toFloat()
-                            posY = (0..maxY).random().toFloat()
-                        }
+        // Reiniciar estados
+        tiempo = 10
+        puntaje = 0
+        juegoActivo = true
+
+        // Cancelar timer anterior si existía
+        timer.value?.cancel()
+
+        // Iniciar nuevo timer
+        val newTimer = object : CountDownTimer(10_000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val segundosRestantes = (millisUntilFinished / 1000).toInt()
+                tiempo = segundosRestantes
+            }
+
+            override fun onFinish() {
+                tiempo = 0
+                juegoActivo = false
+                timer.value = null
+                mostrarAlertaFinJuego(context, name, puntaje, navController)
+            }
+        }
+        newTimer.start()
+        timer.value = newTimer
+    }
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 16.dp, horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Fila con nombre, puntaje y tiempo
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            NombreJugador(name)
+            PuntajeJugador(puntaje)
+            TiempoJuego(tiempo)
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Área limitada del juego (como UIView)
+        TablaDeJuego(
+            ancho = anchoJuego,
+            alto = altoJuego,
+            ositoX = posX,
+            ositoY = posY,
+            onOsitoTocado = {
+                puntaje++
+
+                val maxX = with(density) { (anchoJuego - 70.dp).toPx() }
+                val maxY = with(density) { (altoJuego - 70.dp).toPx() }
+
+                posX = (0..maxX.toInt()).random().toFloat()
+                posY = (0..maxY.toInt()).random().toFloat()
+            }
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Fila de botones
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+             Button(
+                 onClick = { iniciarJuego() },
+                 modifier = Modifier
+                    .height(50.dp)
+                    .weight(1f)
+                    .padding(horizontal = 4.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Magenta,
+                    contentColor = Color.White
+                )
+            ) {
+                Text(
+                    text = "Jugar",
+                    fontSize = 18.sp
                 )
             }
 
-            // Botón para ver Top 5 puntajes
             Button(
                 onClick = {
-                    navController.navigate("top5") // Ruta a la pantalla de puntajes
-                }
+                    navController.navigate("top5")
+                },
+                modifier = Modifier
+                    .height(50.dp)
+                    .weight(1f)
+                    .padding(horizontal = 4.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Magenta,
+                    contentColor = Color.White
+                )
             ) {
-                Text(
-                    "Top 5",
-
-                    )
+                Text("Top 5", fontSize = 18.sp)
             }
         }
     }
