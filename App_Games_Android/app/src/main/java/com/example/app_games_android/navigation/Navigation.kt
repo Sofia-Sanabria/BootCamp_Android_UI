@@ -21,7 +21,7 @@ fun AppNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = Screens.Login.route
+        startDestination = Screens.Home.route
     ) {
 
         // Pantalla de Login
@@ -79,7 +79,7 @@ fun AppNavigation() {
             arguments = listOf(navArgument("name") { type = NavType.StringType })
         ) { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name") ?: ""
-            PokerScreen(jugadorNombre = name, navController = navController)
+            PokerScreen(nombreJugador = name, navController = navController)
         }
     }
 
